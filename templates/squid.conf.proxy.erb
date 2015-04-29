@@ -1,0 +1,67 @@
+## THIS FILE IS MANAGED BY PUPPET.
+## DO NOT EDIT.
+
+
+auth_param basic program /lib/squid/basic_ncsa_auth /etc/squid/<%= @name %>
+
+
+acl ncsa_users proxy_auth REQUIRED
+
+# user-defined http_accesses
+<% if not @http_access.empty? then -%>
+	<% @http_access.each do |line| -%>
+		http_access <%= line %>
+	<% end -%>
+<% end -%>
+http_access allow ncsa_users
+http_access deny all
+
+# user-defined http_port
+<% @http_port.each do |line| -%>
+http_port <%= line %>
+<% end -%>
+
+nonhierarchical_direct off
+
+# user-defined cache-dirs
+<% @cache_dir.each do |line| -%>
+cache_dir <%= line %>
+<% end -%>
+
+# user-defined cache-peers
+<% @cache_peer.each do |line| -%>
+cache_peer <%= line %>
+<% end -%>
+
+# general settings
+forwarded_for                  <%= @forwarded_for                  %>
+follow_x_forwarded_for         <%= @follow_x_forwarded_for         %>
+via                            <%= @via %>
+                 
+<% @request_header_access.each do |line|  -%>
+request_header_access          <%= line                 %>
+<% end -%>
+
+
+access_log                     <%= @access_log                     %>
+
+
+
+cache_store_log                <%= @cache_store_log                %>
+cache_log                      <%= @cache_log                      %>
+<% @cache.each do |line| -%>
+cache                          <%= line                            %>
+<% end -%>
+
+<% @cache_dir.each do |line| -%>
+cache_dir <%= line %>
+<% end -%>
+
+
+# user-defined configuration settings from config_hash
+<% @config_hash.each do |k,v| -%>
+<%= "%*s"%[-30,k] %> <%= v %>
+<% end -%>
+
+# pid filename instance
+pid_filename /var/run/<%= @name %>.pid
